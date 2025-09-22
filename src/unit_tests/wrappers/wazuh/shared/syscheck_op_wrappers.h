@@ -17,6 +17,7 @@
 #endif // WIN32
 
 #include <cJSON.h>
+#include "../../../../os_regex/os_regex.h"
 
 char *__wrap_decode_win_permissions(char *raw_perm);
 
@@ -79,5 +80,10 @@ void expect_get_user(int uid, char *ret);
  * @brief This function loads the expect and will return of the function get_group
  */
 void expect_get_group(int gid, char *ret);
+
+/**
+ * @brief Mock calls to fim_check_restrict
+ */
+int __wrap_fim_check_restrict(const char *file_name, OSMatch *restriction);
 
 #endif /*SYSCHECK_OP_WRAPPERS_H*/

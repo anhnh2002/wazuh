@@ -29,6 +29,12 @@
 #define RegQueryValueEx wrap_RegQueryValueEx
 #undef RegGetKeySecurity
 #define RegGetKeySecurity wrap_RegGetKeySecurity
+#undef RegEnumValueW
+#define RegEnumValueW wrap_RegEnumValueW
+#undef RegEnumKeyExW
+#define RegEnumKeyExW wrap_RegEnumKeyExW
+#undef RegOpenKeyExW
+#define RegOpenKeyExW wrap_RegOpenKeyExW
 
 LONG wrap_RegQueryInfoKey(HKEY hKey,
                           LPSTR lpClass,
@@ -104,5 +110,35 @@ WINBOOL wrap_RegGetKeySecurity(__UNUSED_PARAM(HKEY hKey),
                                LPDWORD lpcbSecurityDescriptor);
 
 void expect_RegGetKeySecurity_call(LPDWORD lpcbSecurityDescriptor, int ret_value);
+
+LONG wrap_RegEnumValueW(HKEY hKey,
+                        DWORD dwIndex,
+                        LPWSTR lpValueName,
+                        LPDWORD lpcchValueName,
+                        LPDWORD lpReserved,
+                        LPDWORD lpType,
+                        LPBYTE lpData,
+                        LPDWORD lpcbData);
+
+void expect_RegEnumValueW_call(LPCWSTR value_name, DWORD type, LPBYTE data, DWORD data_length, LONG return_value);
+
+LONG wrap_RegEnumKeyExW(HKEY hKey,
+                        DWORD dwIndex,
+                        LPWSTR lpName,
+                        LPDWORD lpcchName,
+                        LPDWORD lpReserved,
+                        LPWSTR lpClass,
+                        LPDWORD lpcchClass,
+                        PFILETIME lpftLastWriteTime);
+
+void expect_RegEnumKeyExW_call(LPCWSTR name, DWORD name_length, LONG return_value);
+
+LONG wrap_RegOpenKeyExW(HKEY hKey,
+                        LPCWSTR lpSubKey,
+                        DWORD ulOptions,
+                        REGSAM samDesired,
+                        PHKEY phkResult);
+
+void expect_RegOpenKeyExW_call(HKEY hKey, LPCWSTR sub_key, DWORD options, REGSAM sam, PHKEY result, LONG return_value);
 
 #endif

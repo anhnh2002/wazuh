@@ -170,3 +170,75 @@ void expect_RegGetKeySecurity_call(LPDWORD lpcbSecurityDescriptor, int ret_value
     will_return(wrap_RegGetKeySecurity, lpcbSecurityDescriptor);
     will_return(wrap_RegGetKeySecurity, ret_value);
 }
+
+LONG wrap_RegEnumValueW(__UNUSED_PARAM(HKEY hKey),
+                        __UNUSED_PARAM(DWORD dwIndex),
+                        LPWSTR lpValueName,
+                        LPDWORD lpcchValueName,
+                        __UNUSED_PARAM(LPDWORD lpReserved),
+                        LPDWORD lpType,
+                        LPBYTE lpData,
+                        LPDWORD lpcbData) {
+    const wchar_t *mock_value_name = mock_ptr_type(wchar_t *);
+    wcscpy(lpValueName, mock_value_name);
+    *lpcchValueName = mock_type(long);
+    *lpType = mock_type(long);
+    *lpcbData = mock_type(long);
+    const void *data = mock_ptr_type(void *);
+    memcpy(lpData, data, sizeof(char) * (*lpcbData));
+    return mock();
+}
+
+void expect_RegEnumValueW_call(LPCWSTR value_name, DWORD type, LPBYTE data, DWORD data_length, LONG return_value) {
+    will_return(wrap_RegEnumValueW, value_name);
+    will_return(wrap_RegEnumValueW, wcslen(value_name));
+    will_return(wrap_RegEnumValueW, type);
+    will_return(wrap_RegEnumValueW, data_length);
+    will_return(wrap_RegEnumValueW, data);
+    will_return(wrap_RegEnumValueW, return_value);
+}
+
+LONG wrap_RegEnumKeyExW(__UNUSED_PARAM(HKEY hKey),
+                        __UNUSED_PARAM(DWORD dwIndex),
+                        LPWSTR lpName,
+                        LPDWORD lpcchName,
+                        __UNUSED_PARAM(LPDWORD lpReserved),
+                        __UNUSED_PARAM(LPWSTR lpClass),
+                        __UNUSED_PARAM(LPDWORD lpcchClass),
+                        __UNUSED_PARAM(PFILETIME lpftLastWriteTime)) {
+    const wchar_t *mock_name = mock_ptr_type(wchar_t *);
+    wcscpy(lpName, mock_name);
+    *lpcchName = mock_type(long);
+    return mock();
+}
+
+void expect_RegEnumKeyExW_call(LPCWSTR name, DWORD name_length, LONG return_value) {
+    will_return(wrap_RegEnumKeyExW, name);
+    will_return(wrap_RegEnumKeyExW, name_length);
+    will_return(wrap_RegEnumKeyExW, return_value);
+}
+
+LONG wrap_RegOpenKeyExW(HKEY hKey,
+                        LPCWSTR lpSubKey,
+                        DWORD ulOptions,
+                        REGSAM samDesired,
+                        PHKEY phkResult) {
+    PHKEY key;
+    check_expected(hKey);
+    check_expected_ptr(lpSubKey);
+    check_expected(ulOptions);
+    check_expected(samDesired);
+    if(key = mock_type(PHKEY), key) {
+        memcpy(phkResult, key, sizeof(HKEY));
+    }
+    return mock();
+}
+
+void expect_RegOpenKeyExW_call(HKEY hKey, LPCWSTR sub_key, DWORD options, REGSAM sam, PHKEY result, LONG return_value) {
+    expect_value(wrap_RegOpenKeyExW, hKey, hKey);
+    expect_memory(wrap_RegOpenKeyExW, lpSubKey, sub_key, wcslen(sub_key) * sizeof(wchar_t));
+    expect_value(wrap_RegOpenKeyExW, ulOptions, options);
+    expect_value(wrap_RegOpenKeyExW, samDesired, sam);
+    will_return(wrap_RegOpenKeyExW, result);
+    will_return(wrap_RegOpenKeyExW, return_value);
+}

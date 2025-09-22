@@ -127,3 +127,8 @@ void expect_get_user(int uid, char *ret) {
     will_return(__wrap_get_user, ret);
 }
 #endif
+
+int __wrap_fim_check_restrict(__attribute__((unused)) const char *file_name, OSMatch *restriction) {
+    check_expected(restriction);
+    return mock();
+}

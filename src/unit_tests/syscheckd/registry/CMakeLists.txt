@@ -51,3 +51,30 @@ if(${TARGET} STREQUAL "winagent")
 endif(${TARGET} STREQUAL "winagent")
 
 add_test(NAME test_events COMMAND test_events)
+
+# test_fim_read_values.c tests
+add_executable(test_fim_read_values test_fim_read_values.c)
+
+target_compile_options(test_fim_read_values PRIVATE "-Wall")
+target_compile_options(test_fim_read_values PRIVATE "-g")
+
+target_link_libraries(test_fim_read_values SYSCHECK_O ${TEST_DEPS} fim_shared)
+target_link_libraries(test_fim_read_values "${DEBUG_OP_WRAPPERS} \
+                                           -Wl,--wrap=send_syscheck_msg -Wl,--wrap=os_random -Wl,--wrap,getpid \
+                                           -Wl,--wrap=fim_registry_value_diff -Wl,--wrap=get_registry_permissions \
+                                           -Wl,--wrap=decode_win_acl_json -Wl,--wrap=pthread_mutex_lock -Wl,--wrap=pthread_mutex_unlock \
+                                           -Wl,--wrap,fim_db_init -Wl,--wrap=fim_sync_push_msg -Wl,--wrap=syscom_dispatch \
+                                           -Wl,--wrap=fim_db_get_count_registry_data -Wl,--wrap=fim_db_get_count_registry_key \
+                                           -Wl,--wrap=fim_db_file_pattern_search -Wl,--wrap=fim_db_remove_path -Wl,--wrap,fim_db_get_path \
+                                           -Wl,--wrap=fim_db_file_update -Wl,--wrap=fim_db_file_inode_search -Wl,--wrap,fim_db_get_count_file_inode \
+                                           -Wl,--wrap=fim_db_get_count_file_entry -Wl,--wrap=fim_run_integrity -Wl,--wrap=fim_db_transaction_start \
+                                           -Wl,--wrap=fim_db_transaction_sync_row -Wl,--wrap=fim_db_transaction_deleted_rows \
+                                           -Wl,--wrap=is_fim_shutdown -Wl,--wrap=_imp__dbsync_initialize \
+                                           -Wl,--wrap=_imp__rsync_initialize -Wl,--wrap=fim_db_teardown -Wl,--wrap=fim_check_restrict \
+                                           -Wl,--wrap=wide_to_utf8")
+
+if(${TARGET} STREQUAL "winagent")
+    target_link_libraries(test_fim_read_values fimdb)
+endif(${TARGET} STREQUAL "winagent")
+
+add_test(NAME test_fim_read_values COMMAND test_fim_read_values)
